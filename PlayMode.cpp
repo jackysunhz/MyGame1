@@ -1,5 +1,6 @@
 #include "PlayMode.hpp"
-
+#include "load_save_png.hpp"
+#include <bitset>
 //for the GL_ERRORS() macro:
 #include "gl_errors.hpp"
 
@@ -46,29 +47,100 @@ PlayMode::PlayMode() {
 			}
 			ppu.tile_table[index] = tile;
 		}
+
+		
+		
 	}
 
+	///Load PNGs into vector of colors
+
+	//load spider tile
+	glm::uvec2 spider_size(8,8);
+	std::vector< glm::u8vec4> spider_tile_vec;
+	load_png("../Assets/spider.png", &spider_size, &spider_tile_vec, LowerLeftOrigin);
+	//load spider pallete
+	glm::uvec2 spider_pallete_size(2,2);
+	std::vector< glm::u8vec4> spider_pal_vec;
+	load_png("../Assets/spider_pal.png", &spider_pallete_size, &spider_pal_vec, LowerLeftOrigin);
+
+	//load demon tiles
+	glm::uvec2 demon_size(32,32);
+	std::vector< glm::u8vec4> demon_tile_vec;
+	load_png("../Assets/demon.png", &demon_size, &demon_tile_vec, LowerLeftOrigin);
+	//load demon pallete
+	glm::uvec2 demon_pallete_size(2,2);
+	std::vector< glm::u8vec4> demon_pal_vec;
+	load_png("../Assets/demon_pal.png", &demon_pallete_size, &demon_pal_vec, LowerLeftOrigin);
+
+
+	///Convert PNGs to tiles and palletes
+
+	//convert spider tile
+	for(int row = 0; row < 8; row ++){
+		for(int col = 0; col < 8; col ++){
+			int vec_idx = row * 8 + col;
+			if(spider_tile_vec[vec_idx] == spider_pal_vec[0]){
+				//bit idx is 00
+				spiderTile.bit0[row] &= ~(1 << col);
+				spiderTile.bit1[row] &= ~(1 << col);
+			}
+			else if(spider_tile_vec[vec_idx] == spider_pal_vec[1]){
+				//bit idx is 01
+				spiderTile.bit0[row] &= ~(1 << col);
+				spiderTile.bit1[row] |= (1 << col);
+			}
+			else if(spider_tile_vec[vec_idx] == spider_pal_vec[2]){
+				//bit idx is 10
+				spiderTile.bit0[row] |= (1 << col);
+				spiderTile.bit1[row] &= ~(1 << col);
+			}
+			else if(spider_tile_vec[vec_idx] == spider_pal_vec[3]){
+				//bit idx is 11
+				spiderTile.bit0[row] |= (1 << col);
+				spiderTile.bit1[row] |= (1 << col);
+			}
+		}
+	}
+
+	//convert demon tiles
+	for(int tile_idx = 0; tile_idx < 16; tile_idx ++){
+		for(int row = 0; row < 8; row ++){
+			for(int col = 0; col < 8; col ++){
+				int vec_idx = tile_idx * 64 + row * 32 + col;
+				if(demon_tile_vec[vec_idx] == demon_pal_vec[0]){
+					//bit idx is 00
+					demonTiles[tile_idx].bit0[row] &= ~(1 << col);
+					demonTiles[tile_idx].bit1[row] &= ~(1 << col);
+				}
+				else if(demon_tile_vec[vec_idx] == demon_pal_vec[1]){
+					//bit idx is 01
+					demonTiles[tile_idx].bit0[row] &= ~(1 << col);
+					demonTiles[tile_idx].bit1[row] |= (1 << col);
+				}
+				else if(demon_tile_vec[vec_idx] == demon_pal_vec[2]){
+					//bit idx is 10
+					demonTiles[tile_idx].bit0[row] |= (1 << col);
+					demonTiles[tile_idx].bit1[row] &= ~(1 << col);
+				}
+				else if(demon_tile_vec[vec_idx] == demon_pal_vec[3]){
+					//bit idx is 11
+					demonTiles[tile_idx].bit0[row] |= (1 << col);
+					demonTiles[tile_idx].bit1[row] |= (1 << col);
+				}
+			}
+		}
+	}
+	
+	//use sprite 33 - 48 as a "demon":
+	for(int i = 0; i < 16; i++){
+		ppu.tile_table[33 + i] = demonTiles[i];
+	}
+
+
 	//use sprite 32 as a "player":
-	ppu.tile_table[32].bit0 = {
-		0b01111110,
-		0b11111111,
-		0b11111111,
-		0b11111111,
-		0b11111111,
-		0b11111111,
-		0b11111111,
-		0b01111110,
-	};
-	ppu.tile_table[32].bit1 = {
-		0b00000000,
-		0b00000000,
-		0b00011000,
-		0b00100100,
-		0b00000000,
-		0b00100100,
-		0b00000000,
-		0b00000000,
-	};
+	ppu.tile_table[32] = spiderTile;
+
+	
 
 	//makes the outside of tiles 0-16 solid:
 	ppu.palette_table[0] = {
@@ -88,11 +160,25 @@ PlayMode::PlayMode() {
 
 	//used for the player:
 	ppu.palette_table[7] = {
-		glm::u8vec4(0x00, 0x00, 0x00, 0x00),
-		glm::u8vec4(0xff, 0xff, 0x00, 0xff),
-		glm::u8vec4(0x00, 0x00, 0x00, 0xff),
-		glm::u8vec4(0x00, 0x00, 0x00, 0xff),
+		spider_pal_vec[0],
+		spider_pal_vec[1],
+		spider_pal_vec[2],
+		spider_pal_vec[3]
 	};
+
+	//used for the demon:
+	ppu.palette_table[2] = {
+		demon_pal_vec[0],
+		demon_pal_vec[1],
+		demon_pal_vec[2],
+		demon_pal_vec[3]
+	};
+	// ppu.palette_table[7] = {
+	// 	glm::u8vec4(0x00, 0x00, 0x00, 0x00),
+	// 	glm::u8vec4(0xff, 0xff, 0x00, 0xff),
+	// 	glm::u8vec4(0x00, 0x00, 0x00, 0xff),
+	// 	glm::u8vec4(0x00, 0x00, 0x00, 0xff),
+	// };
 
 	//used for the misc other sprites:
 	ppu.palette_table[6] = {
@@ -197,14 +283,25 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	ppu.sprites[0].attributes = 7;
 
 	//some other misc sprites:
-	for (uint32_t i = 1; i < 63; ++i) {
-		float amt = (i + 2.0f * background_fade) / 62.0f;
-		ppu.sprites[i].x = int8_t(0.5f * PPU466::ScreenWidth + std::cos( 2.0f * M_PI * amt * 5.0f + 0.01f * player_at.x) * 0.4f * PPU466::ScreenWidth);
-		ppu.sprites[i].y = int8_t(0.5f * PPU466::ScreenHeight + std::sin( 2.0f * M_PI * amt * 3.0f + 0.01f * player_at.y) * 0.4f * PPU466::ScreenWidth);
-		ppu.sprites[i].index = 32;
-		ppu.sprites[i].attributes = 6;
-		if (i % 2) ppu.sprites[i].attributes |= 0x80; //'behind' bit
+	// for (uint32_t i = 1; i < 63; ++i) {
+	// 	float amt = (i + 2.0f * background_fade) / 62.0f;
+	// 	ppu.sprites[i].x = int8_t(0.5f * PPU466::ScreenWidth + std::cos( 2.0f * M_PI * amt * 5.0f + 0.01f * player_at.x) * 0.4f * PPU466::ScreenWidth);
+	// 	ppu.sprites[i].y = int8_t(0.5f * PPU466::ScreenHeight + std::sin( 2.0f * M_PI * amt * 3.0f + 0.01f * player_at.y) * 0.4f * PPU466::ScreenWidth);
+	// 	ppu.sprites[i].index = 32;
+	// 	ppu.sprites[i].attributes = 6;
+	// 	if (i % 2) ppu.sprites[i].attributes |= 0x80; //'behind' bit
+	// }
+
+	//demon sprite:
+	std::array<uint8_t, 2> demon_pos = {PPU466::ScreenWidth/2, PPU466::ScreenHeight/2};
+	for(int spriteidx = 0; spriteidx < 16; spriteidx ++){
+		ppu.sprites[spriteidx + 1].x = (uint8_t)(demon_pos[0] + spriteidx % 4 * 8);
+		ppu.sprites[spriteidx + 1].y = (uint8_t)(demon_pos[1] + spriteidx / 4 * 8);
+		ppu.sprites[spriteidx + 1].index = (uint8_t)(33 + spriteidx);
+		ppu.sprites[spriteidx + 1].attributes = 2;
+		//if (spriteidx % 2) ppu.sprites[spriteidx].attributes |= 0x80; //'behind' bit
 	}
+
 
 	//--- actually draw ---
 	ppu.draw(drawable_size);

@@ -105,6 +105,8 @@ int main(int argc, char **argv) {
 	//------------ load assets --------------
 	call_load_functions();
 
+
+
 	//------------ create game mode + make current --------------
 	Mode::set_current(std::make_shared< PlayMode >());
 
