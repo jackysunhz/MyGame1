@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
 
 	//create window:
 	SDL_Window *window = SDL_CreateWindow(
-		"gp23 game1: remember to change your title", //TODO: remember to set a title for your game!
+		"I Hate Fireballs", //TODO: remember to set a title for your game!
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		2*PPU466::ScreenWidth + 8, 2*PPU466::ScreenHeight + 8, //TODO: modify window size if you'd like
 		SDL_WINDOW_OPENGL
@@ -104,8 +104,6 @@ int main(int argc, char **argv) {
 
 	//------------ load assets --------------
 	call_load_functions();
-
-
 
 	//------------ create game mode + make current --------------
 	Mode::set_current(std::make_shared< PlayMode >());

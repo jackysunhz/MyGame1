@@ -27,11 +27,26 @@ struct PlayMode : Mode {
 	float background_fade = 0.0f;
 
 	//player position:
-	glm::vec2 player_at = glm::vec2(0.0f);
+	glm::vec2 player_at = glm::vec2(8,8);
+
+	//boss position:
+	glm::vec2 boss_at = glm::vec2(PPU466::ScreenWidth/2 - 16, PPU466::ScreenHeight - 64);
+
+	//fireball position:
+	std::array<glm::vec2, 4> fireballs_at = {glm::vec2(0, 255),glm::vec2(0, 255),glm::vec2(0, 255),glm::vec2(0, 255)};
 
 	//----- drawing handled by PPU466 -----
 
 	PPU466 ppu;
+
+
 	PPU466::Tile spiderTile;
 	std::array<PPU466::Tile, 16> demonTiles;
+	PPU466::Tile fireballTile;
+	PPU466::Tile playeraliveTile;
+	PPU466::Tile playerdeadTile;
+
+	bool gameEnd = false;
+
+	//static float totalTime;
 };

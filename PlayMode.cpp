@@ -52,6 +52,7 @@ PlayMode::PlayMode() {
 		
 	}
 
+
 	///Load PNGs into vector of colors
 
 	//load spider tile
@@ -72,6 +73,31 @@ PlayMode::PlayMode() {
 	std::vector< glm::u8vec4> demon_pal_vec;
 	load_png("../Assets/demon_pal.png", &demon_pallete_size, &demon_pal_vec, LowerLeftOrigin);
 
+	//load fireball tiles
+	glm::uvec2 fireball_size(8,8);
+	std::vector< glm::u8vec4> fireball_tile_vec;
+	load_png("../Assets/fireball.png", &fireball_size, &fireball_tile_vec, LowerLeftOrigin);
+	//load fireball pallete
+	glm::uvec2 fireball_pallete_size(2,2);
+	std::vector< glm::u8vec4> fireball_pal_vec;
+	load_png("../Assets/fireball_pal.png", &fireball_pallete_size, &fireball_pal_vec, LowerLeftOrigin);
+
+	//load player tiles
+	glm::uvec2 player_size(8,8);
+	std::vector< glm::u8vec4> playeralive_tile_vec;
+	load_png("../Assets/playeralive.png", &player_size, &playeralive_tile_vec, LowerLeftOrigin);
+	std::vector< glm::u8vec4> playerdead_tile_vec;
+	load_png("../Assets/playerdead.png", &player_size, &playerdead_tile_vec, LowerLeftOrigin);
+	//load player pallete
+	glm::uvec2 player_pallete_size(2,2);
+	std::vector< glm::u8vec4> player_pal_vec;
+	load_png("../Assets/player_pal.png", &player_pallete_size, &player_pal_vec, LowerLeftOrigin);
+
+	// std::cout<<(int)demon_pal_vec[0].r << " "<< (int)demon_pal_vec[0].g << " "<< (int)demon_pal_vec[0].b << " "<< (int)demon_pal_vec[0].a << " "<< std::endl;
+	// std::cout<<(int)demon_pal_vec[1].r << " "<< (int)demon_pal_vec[1].g << " "<< (int)demon_pal_vec[1].b << " "<< (int)demon_pal_vec[1].a << " "<< std::endl;
+	// std::cout<<(int)demon_pal_vec[2].r << " "<< (int)demon_pal_vec[2].g << " "<< (int)demon_pal_vec[2].b << " "<< (int)demon_pal_vec[2].a << " "<< std::endl;
+	// std::cout<<(int)demon_pal_vec[3].r << " "<< (int)demon_pal_vec[3].g << " "<< (int)demon_pal_vec[3].b << " "<< (int)demon_pal_vec[3].a << " "<< std::endl;
+	// std::cout << demon_tile_vec.size() << std::endl;
 
 	///Convert PNGs to tiles and palletes
 
@@ -102,11 +128,95 @@ PlayMode::PlayMode() {
 		}
 	}
 
+	//convert player tiles
+	for(int row = 0; row < 8; row ++){
+		for(int col = 0; col < 8; col ++){
+			int vec_idx = row * 8 + col;
+			if(playeralive_tile_vec[vec_idx] == player_pal_vec[0]){
+				//bit idx is 00
+				playeraliveTile.bit0[row] &= ~(1 << col);
+				playeraliveTile.bit1[row] &= ~(1 << col);
+			}
+			else if(playeralive_tile_vec[vec_idx] == player_pal_vec[1]){
+				//bit idx is 01
+				playeraliveTile.bit0[row] &= ~(1 << col);
+				playeraliveTile.bit1[row] |= (1 << col);
+			}
+			else if(playeralive_tile_vec[vec_idx] == player_pal_vec[2]){
+				//bit idx is 10
+				playeraliveTile.bit0[row] |= (1 << col);
+				playeraliveTile.bit1[row] &= ~(1 << col);
+			}
+			else if(playeralive_tile_vec[vec_idx] == player_pal_vec[3]){
+				//bit idx is 11
+				playeraliveTile.bit0[row] |= (1 << col);
+				playeraliveTile.bit1[row] |= (1 << col);
+			}
+		}
+	}
+
+	//convert player tiles
+	for(int row = 0; row < 8; row ++){
+		for(int col = 0; col < 8; col ++){
+			int vec_idx = row * 8 + col;
+			if(playerdead_tile_vec[vec_idx] == player_pal_vec[0]){
+				//bit idx is 00
+				playerdeadTile.bit0[row] &= ~(1 << col);
+				playerdeadTile.bit1[row] &= ~(1 << col);
+			}
+			else if(playerdead_tile_vec[vec_idx] == player_pal_vec[1]){
+				//bit idx is 01
+				playerdeadTile.bit0[row] &= ~(1 << col);
+				playerdeadTile.bit1[row] |= (1 << col);
+			}
+			else if(playerdead_tile_vec[vec_idx] == player_pal_vec[2]){
+				//bit idx is 10
+				playerdeadTile.bit0[row] |= (1 << col);
+				playerdeadTile.bit1[row] &= ~(1 << col);
+			}
+			else if(playerdead_tile_vec[vec_idx] == player_pal_vec[3]){
+				//bit idx is 11
+				playerdeadTile.bit0[row] |= (1 << col);
+				playerdeadTile.bit1[row] |= (1 << col);
+			}
+		}
+	}
+	
+
+	//convert fireball tiles
+	for(int row = 0; row < 8; row ++){
+		for(int col = 0; col < 8; col ++){
+			int vec_idx = row * 8 + col;
+			if(fireball_tile_vec[vec_idx] == fireball_pal_vec[0]){
+				//bit idx is 00
+				fireballTile.bit0[row] &= ~(1 << col);
+				fireballTile.bit1[row] &= ~(1 << col);
+			}
+			else if(fireball_tile_vec[vec_idx] == fireball_pal_vec[1]){
+				//bit idx is 01
+				fireballTile.bit0[row] &= ~(1 << col);
+				fireballTile.bit1[row] |= (1 << col);
+			}
+			else if(fireball_tile_vec[vec_idx] == fireball_pal_vec[2]){
+				//bit idx is 10
+				fireballTile.bit0[row] |= (1 << col);
+				fireballTile.bit1[row] &= ~(1 << col);
+			}
+			else if(fireball_tile_vec[vec_idx] == fireball_pal_vec[3]){
+				//bit idx is 11
+				fireballTile.bit0[row] |= (1 << col);
+				fireballTile.bit1[row] |= (1 << col);
+			}
+		}
+	}
+
 	//convert demon tiles
 	for(int tile_idx = 0; tile_idx < 16; tile_idx ++){
 		for(int row = 0; row < 8; row ++){
 			for(int col = 0; col < 8; col ++){
-				int vec_idx = tile_idx * 64 + row * 32 + col;
+				int vec_row = tile_idx / 4 * 8 + row;
+				int vec_col = tile_idx % 4 * 8 + col;
+				int vec_idx = vec_row * 32 + vec_col;
 				if(demon_tile_vec[vec_idx] == demon_pal_vec[0]){
 					//bit idx is 00
 					demonTiles[tile_idx].bit0[row] &= ~(1 << col);
@@ -138,9 +248,10 @@ PlayMode::PlayMode() {
 
 
 	//use sprite 32 as a "player":
-	ppu.tile_table[32] = spiderTile;
+	ppu.tile_table[32] = playeraliveTile;
 
-	
+	//use sprite 49 as a "fireball":
+	ppu.tile_table[49] = fireballTile;
 
 	//makes the outside of tiles 0-16 solid:
 	ppu.palette_table[0] = {
@@ -160,25 +271,41 @@ PlayMode::PlayMode() {
 
 	//used for the player:
 	ppu.palette_table[7] = {
-		spider_pal_vec[0],
-		spider_pal_vec[1],
-		spider_pal_vec[2],
-		spider_pal_vec[3]
+		player_pal_vec[0],
+		player_pal_vec[2],
+		player_pal_vec[1],
+		player_pal_vec[3]
 	};
 
 	//used for the demon:
 	ppu.palette_table[2] = {
 		demon_pal_vec[0],
-		demon_pal_vec[1],
 		demon_pal_vec[2],
-		demon_pal_vec[3]
+		demon_pal_vec[3],
+		demon_pal_vec[1]
 	};
-	// ppu.palette_table[7] = {
-	// 	glm::u8vec4(0x00, 0x00, 0x00, 0x00),
-	// 	glm::u8vec4(0xff, 0xff, 0x00, 0xff),
-	// 	glm::u8vec4(0x00, 0x00, 0x00, 0xff),
-	// 	glm::u8vec4(0x00, 0x00, 0x00, 0xff),
-	// };
+
+	ppu.palette_table[3] = {
+		glm::u8vec4(0x4f, 0x24, 0x45, 0xff),
+		glm::u8vec4(0x4f, 0x24, 0x45, 0xff),
+		glm::u8vec4(0x4f, 0x24, 0x45, 0xff),
+		glm::u8vec4(0x4f, 0x24, 0x45, 0xff)
+	};
+
+	//used for the fireball:
+	ppu.palette_table[4] = {
+		fireball_pal_vec[0],
+		fireball_pal_vec[2],
+		fireball_pal_vec[1],
+		fireball_pal_vec[3]
+	};
+
+	ppu.palette_table[5] = {
+		glm::u8vec4(0x30, 0x30, 0x30, 0xff),
+		glm::u8vec4(0x30, 0x30, 0x30, 0xff),
+		glm::u8vec4(0x30, 0x30, 0x30, 0xff),
+		glm::u8vec4(0x30, 0x30, 0x30, 0xff)
+	};
 
 	//used for the misc other sprites:
 	ppu.palette_table[6] = {
@@ -234,12 +361,60 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 
 void PlayMode::update(float elapsed) {
 
+	if(gameEnd){
+		return;
+	}
+	static float totalTime = 0;
+	totalTime += elapsed;
+
+	static float fireTimer = 0;
+	fireTimer += elapsed;
+	if (fireTimer >= 2)
+	{
+		//trigger fire event
+
+		for(auto &fireball_at : fireballs_at){
+			if(fireball_at.y > 250){
+				fireball_at.x = boss_at.x;
+				fireball_at.y = boss_at.y;
+				break;
+			}
+		}
+		fireTimer = 0;
+	}
+	
+	//move fireballs
+	for(auto &fireball_at : fireballs_at){
+		if(fireball_at.y < 240)
+		{
+			fireball_at.y -= 65 * elapsed;
+		}
+		if(fireball_at.y <= -8){
+			fireball_at.y = 255;
+		}
+		//std::cout << "fireball: " << (int)fireball_at.x << " " << (int)fireball_at.y << std::endl;
+		//std::cout << "player: " << (int)player_at.x << " " << (int)player_at.y << std::endl;
+		glm::vec2 d = fireball_at - player_at;
+		if((d.x*d.x + d.y*d.y) < 64){
+			gameEnd = true;
+			ppu.tile_table[32] = playerdeadTile;
+			std::cout << "Game Over" << std::endl;
+		}
+	}
+
+	// std::cout << "fireball 1: " << (int)fireballs_at[0].x << " " << (int)fireballs_at[0].y << std::endl;
+	// std::cout << "fireball 2: " << (int)fireballs_at[1].x << " " << (int)fireballs_at[1].y << std::endl;
+	// std::cout << "fireball 3: " << (int)fireballs_at[2].x << " " << (int)fireballs_at[2].y << std::endl;
+	// std::cout << "fireball 4: " << (int)fireballs_at[3].x << " " << (int)fireballs_at[3].y << std::endl;
+	// std::cout<<std::endl;
 	//slowly rotates through [0,1):
 	// (will be used to set background color)
-	background_fade += elapsed / 10.0f;
-	background_fade -= std::floor(background_fade);
+	//background_fade += elapsed / 10.0f;
+	//background_fade -= std::floor(background_fade);
 
-	constexpr float PlayerSpeed = 30.0f;
+	boss_at.x = sin(totalTime/2) * 100 + PPU466::ScreenWidth/2 - 16;
+
+	constexpr float PlayerSpeed = 50.0f;
 	if (left.pressed) player_at.x -= PlayerSpeed * elapsed;
 	if (right.pressed) player_at.x += PlayerSpeed * elapsed;
 	if (down.pressed) player_at.y -= PlayerSpeed * elapsed;
@@ -257,9 +432,9 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 	//background color will be some hsv-like fade:
 	ppu.background_color = glm::u8vec4(
-		std::min(255,std::max(0,int32_t(255 * 0.5f * (0.5f + std::sin( 2.0f * M_PI * (background_fade + 0.0f / 3.0f) ) ) ))),
-		std::min(255,std::max(0,int32_t(255 * 0.5f * (0.5f + std::sin( 2.0f * M_PI * (background_fade + 1.0f / 3.0f) ) ) ))),
-		std::min(255,std::max(0,int32_t(255 * 0.5f * (0.5f + std::sin( 2.0f * M_PI * (background_fade + 2.0f / 3.0f) ) ) ))),
+		0xff,
+		0xff,
+		0xff,
 		0xff
 	);
 
@@ -268,13 +443,17 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	for (uint32_t y = 0; y < PPU466::BackgroundHeight; ++y) {
 		for (uint32_t x = 0; x < PPU466::BackgroundWidth; ++x) {
 			//TODO: make weird plasma thing
-			ppu.background[x+PPU466::BackgroundWidth*y] = ((x+y)%16);
+			ppu.background[x+PPU466::BackgroundWidth*y] = 0b0000001100100000;
+			if(x == 0 || x == PPU466::ScreenWidth/8 - 1 || y == 0 || y == PPU466::ScreenHeight/8 -1){
+				ppu.background[x+PPU466::BackgroundWidth*y] = 0b0000010100100000;
+			}
+
 		}
 	}
 
 	//background scroll:
-	ppu.background_position.x = int32_t(-0.5f * player_at.x);
-	ppu.background_position.y = int32_t(-0.5f * player_at.y);
+	//ppu.background_position.x = int32_t(-0.5f * player_at.x);
+	//ppu.background_position.y = int32_t(-0.5f * player_at.y);
 
 	//player sprite:
 	ppu.sprites[0].x = int8_t(player_at.x);
@@ -293,14 +472,25 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	// }
 
 	//demon sprite:
-	std::array<uint8_t, 2> demon_pos = {PPU466::ScreenWidth/2, PPU466::ScreenHeight/2};
 	for(int spriteidx = 0; spriteidx < 16; spriteidx ++){
-		ppu.sprites[spriteidx + 1].x = (uint8_t)(demon_pos[0] + spriteidx % 4 * 8);
-		ppu.sprites[spriteidx + 1].y = (uint8_t)(demon_pos[1] + spriteidx / 4 * 8);
+		ppu.sprites[spriteidx + 1].x = (uint8_t)(boss_at.x + spriteidx % 4 * 8);
+		ppu.sprites[spriteidx + 1].y = (uint8_t)(boss_at.y + spriteidx / 4 * 8);
 		ppu.sprites[spriteidx + 1].index = (uint8_t)(33 + spriteidx);
 		ppu.sprites[spriteidx + 1].attributes = 2;
 		//if (spriteidx % 2) ppu.sprites[spriteidx].attributes |= 0x80; //'behind' bit
 	}
+
+	//fireball sprites:
+	for(int spriteidx = 0; spriteidx < 4; spriteidx ++){
+		ppu.sprites[spriteidx + 17].x = (uint8_t)(fireballs_at[spriteidx].x);
+		ppu.sprites[spriteidx + 17].y = (uint8_t)(fireballs_at[spriteidx].y);
+		ppu.sprites[spriteidx + 17].index = 49;
+		ppu.sprites[spriteidx + 17].attributes = 4;
+		//if (spriteidx % 2) ppu.sprites[spriteidx].attributes |= 0x80; //'behind' bit
+	}
+
+	//ppu.sprites[17].x = (uint8_t)(player_at.x + 8);
+	//ppu.sprites[17].y = (uint8_t)(player_at.y + 8);
 
 
 	//--- actually draw ---

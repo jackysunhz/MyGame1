@@ -1,8 +1,8 @@
-# (TODO: your game's title)
+# I Hate Fireballs
 
-Author: (TODO: your name)
+Author: Jacky Sun
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+Design: Player will need to dodge fireballs launched by a demon or suffer LETHAL consequences.
 
 Screen Shot:
 
@@ -10,13 +10,18 @@ Screen Shot:
 
 How Your Asset Pipeline Works:
 
-(TODO: describe the steps in your asset pipeline, from source files to tiles/backgrounds/whatever you upload to the PPU466.)
+1. I create png assets from pixilart.com.
+2. I use the load_png function to load my pngs in as cpp vector of colors
+3. For each png asset, I made a separate 2*2 pallate png just for the code to read colors into a PPU466 pallate.
+4. Loop through color vectors and correctly set the bitmaps of associated Tiles using bit operations.
+5. For assets that need multiple tiles, there is additional handling in step 4's loops to account for tile offset and assembly.
+6. Finally in draw() I just need to associate sprites with my custom tiles through the ppu tile table.
 
-(TODO: make sure the source files you drew are included. You can [link](your/file.png) to them to be a bit fancier.)
+You can find all of the assets used here: [link](Assets/)
 
 How To Play:
 
-(TODO: describe the controls and (if needed) goals/strategy.)
+Use arrow keys to move player sprite.
 
 This game was built with [NEST](NEST.md).
 
